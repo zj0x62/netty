@@ -18,69 +18,76 @@ package io.netty.channel;
 import io.netty.util.concurrent.ThreadAwareExecutor;
 
 /**
- * Handles IO dispatching for an {@link ThreadAwareExecutor}.
- * All operations except {@link #wakeup()} and {@link #isCompatible(Class)} <strong>MUST</strong> be executed
- * on the {@link ThreadAwareExecutor} thread (which means {@link ThreadAwareExecutor#isExecutorThread(Thread)} must
- * return {@code true}) and should never be called from the user-directly.
+ * 为 {@link ThreadAwareExecutor} 处理 I/O 事件分发的处理器。
  * <p>
- * Once a {@link IoHandle} is registered via the {@link #register(IoHandle)} method it's possible
- * to submit {@link IoOps} related to the {@link IoHandle} via {@link IoRegistration#submit(IoOps)}.
- * These submitted {@link IoOps} are the "source" of {@link IoEvent}s that are dispatched to the registered
- * {@link IoHandle} via the {@link IoHandle#handle(IoRegistration, IoEvent)} method.
- * These events must be consumed (and handled) as otherwise they might be reported again until handled.
- *
+ * 除 {@link #wakeup()} 和 {@link #isCompatible(Class)} 夗，所有操作<strong>必须</strong>在
+ * {@link ThreadAwareExecutor} 的线程上执行（即 {@link ThreadAwareExecutor#isExecutorThread(Thread)}
+ * 必须返回 {@code true}），且不应由用户直接调用。
+ * <p>
+ * 一旦通过 {@link #register(IoHandle)} 方法注册了 {@link IoHandle}，就可以通过
+ * {@link IoRegistration#submit(IoOps)} 提交与该 IoHandle 关联的 {@link IoOps}。
+ * 这些提交的 IoOps 是 {@link IoEvent} 的"来源"，IoEvent 会通过
+ * {@link IoHandle#handle(IoRegistration, IoEvent)} 方法分发给已注册的 IoHandle。
+ * 这些事件必须被消费（处理），否则可能会被重复上报直到被处理。
+ * <p>
+ * 该接口是 Netty 4.2 中对 I/O 多路复用的抽象层，不同的实现（如 NIO Selector、Epoll、Kqueue、IO_Uring）
+ * 通过不同的 IoHandler 实现来适配平台特定的 I/O 机制。
  */
 public interface IoHandler {
 
     /**
-     * Initialize this {@link IoHandler}.
+     * 初始化该 {@link IoHandler}。
+     * <p>
+     * 在开始处理 I/O 事件之前调用，用于执行必要的初始化操作（如创建 Selector 等）。
      */
     default void initialize() { }
 
     /**
-     * Run the IO handled by this {@link IoHandler}. The {@link IoHandlerContext} should be used
-     * to ensure we not execute too long and so block the processing of other task that are
-     * scheduled on the {@link ThreadAwareExecutor}. This is done by taking {@link IoHandlerContext#delayNanos(long)}
-     * or {@link IoHandlerContext#deadlineNanos()} into account.
+     * 执行该 {@link IoHandler} 负责的 I/O 事件处理。
+     * <p>
+     * 应使用 {@link IoHandlerContext} 来确保不会执行过长时间，从而阻塞 {@link ThreadAwareExecutor}
+     * 上调度的其他任务。通过参考 {@link IoHandlerContext#delayNanos(long)} 或
+     * {@link IoHandlerContext#deadlineNanos()} 来控制执行时长。
      *
-     * @param  context  the {@link IoHandlerContext}.
-     * @return          the number of {@link IoHandle} for which I/O was handled.
-     *                  Internal events such as wakeups and timer expirations must not be included in this count.
+     * @param context I/O 上下文，提供时间控制信息
+     * @return 本次处理中已处理 I/O 事件的 {@link IoHandle} 数量。
+     *         内部事件（如唤醒和定时器过期）不应计入此数量
      */
     int run(IoHandlerContext context);
 
     /**
-     * Prepare to destroy this {@link IoHandler}. This method will be called before {@link #destroy()} and may be
-     * called multiple times.
+     * 准备销毁该 {@link IoHandler}。该方法将在 {@link #destroy()} 之前被调用，且可能被多次调用。
+     * <p>
+     * 用于在正式销毁前执行清理准备工作，如停止接受新的注册等。
      */
     default void prepareToDestroy() { }
 
     /**
-     * Destroy the {@link IoHandler} and free all its resources. Once destroyed using the {@link IoHandler} will
-     * cause undefined behaviour.
+     * 销毁该 {@link IoHandler} 并释放其所有资源。一旦销毁，继续使用该 IoHandler 将导致未定义行为。
      */
     default void destroy() { }
 
     /**
-     * Register a {@link IoHandle} for IO.
+     * 注册一个 {@link IoHandle} 以接收 I/O 事件。
      *
-     * @param handle        the {@link IoHandle} to register.
-     * @throws Exception    thrown if an error happens during registration.
+     * @param handle 要注册的 IoHandle
+     * @return 与该 IoHandle 关联的注册对象，用于提交 I/O 操作
+     * @throws Exception 注册过程中发生错误时抛出
      */
     IoRegistration register(IoHandle handle) throws Exception;
 
     /**
-     * Wakeup the {@link IoHandler}, which means if any operation blocks it should be unblocked and
-     * return as soon as possible.
+     * 唤醒该 {@link IoHandler}。如果有任何阻塞操作，应立即解除阻塞并尽快返回。
+     * <p>
+     * 该方法可以在任意线程上调用，用于唤醒正在阻塞等待 I/O 事件的 EventLoop 线程。
      */
     void wakeup();
 
     /**
-     * Returns {@code true} if the given type is compatible with this {@link IoHandler} and so can be registered,
-     * {@code false} otherwise.
+     * 判断给定的 {@link IoHandle} 类型是否与该 {@link IoHandler} 兼容，即是否可以被注册。
      *
-     * @param handleType the type of the {@link IoHandle}.
-     * @return if compatible of not.
+     * @param handleType IoHandle 的类型
+     * @return 如果兼容返回 {@code true}，否则返回 {@code false}
      */
     boolean isCompatible(Class<? extends IoHandle> handleType);
 }

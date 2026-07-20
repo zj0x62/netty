@@ -20,149 +20,169 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * The result of an asynchronous operation.
+ * 异步操作的结果。
+ * <p>
+ * 该接口扩展了 JDK 的 {@link java.util.concurrent.Future}，提供了更丰富的异步操作支持，
+ * 包括监听器机制、同步等待、异常获取等功能。它是 Netty 异步编程模型的基石，
+ * {@link io.netty.channel.ChannelFuture} 等接口均继承自该接口。
+ *
+ * @param <V> 异步操作结果的类型
  */
 @SuppressWarnings("ClassNameSameAsAncestorName")
 public interface Future<V> extends java.util.concurrent.Future<V> {
 
     /**
-     * Returns {@code true} if and only if the I/O operation was completed
-     * successfully.
+     * 当且仅当 I/O 操作成功完成时返回 {@code true}。
+     *
+     * @return 如果操作成功完成返回 {@code true}，否则返回 {@code false}
      */
     boolean isSuccess();
 
     /**
-     * returns {@code true} if and only if the operation can be cancelled via {@link #cancel(boolean)}.
+     * 当且仅当该操作可通过 {@link #cancel(boolean)} 取消时返回 {@code true}。
+     *
+     * @return 如果操作可取消返回 {@code true}，否则返回 {@code false}
      */
     boolean isCancellable();
 
     /**
-     * Returns the cause of the failed I/O operation if the I/O operation has
-     * failed.
+     * 返回 I/O 操作失败的原因。
      *
-     * @return the cause of the failure.
-     *         {@code null} if succeeded or this future is not
-     *         completed yet.
+     * @return 失败原因；如果操作成功或该 Future 尚未完成则返回 {@code null}
      */
     Throwable cause();
 
     /**
-     * Adds the specified listener to this future.  The
-     * specified listener is notified when this future is
-     * {@linkplain #isDone() done}.  If this future is already
-     * completed, the specified listener is notified immediately.
+     * 向该 Future 添加指定的监听器。当该 Future {@linkplain #isDone() 完成}时，指定的监听器将被通知。
+     * 如果该 Future 已经完成，指定的监听器将立即被通知。
+     *
+     * @param listener 要添加的监听器
+     * @return 该 Future 自身，支持链式调用
      */
     Future<V> addListener(GenericFutureListener<? extends Future<? super V>> listener);
 
     /**
-     * Adds the specified listeners to this future.  The
-     * specified listeners are notified when this future is
-     * {@linkplain #isDone() done}.  If this future is already
-     * completed, the specified listeners are notified immediately.
+     * 向该 Future 添加多个监听器。当该 Future {@linkplain #isDone() 完成}时，所有指定的监听器将被通知。
+     * 如果该 Future 已经完成，所有指定的监听器将立即被通知。
+     *
+     * @param listeners 要添加的监听器数组
+     * @return 该 Future 自身，支持链式调用
      */
     Future<V> addListeners(GenericFutureListener<? extends Future<? super V>>... listeners);
 
     /**
-     * Removes the first occurrence of the specified listener from this future.
-     * The specified listener is no longer notified when this
-     * future is {@linkplain #isDone() done}.  If the specified
-     * listener is not associated with this future, this method
-     * does nothing and returns silently.
+     * 从该 Future 中移除指定监听器的第一个匹配项。被移除的监听器将不再在该 Future
+     * {@linkplain #isDone() 完成}时收到通知。如果指定的监听器未关联到该 Future，该方法不执行任何操作。
+     *
+     * @param listener 要移除的监听器
+     * @return 该 Future 自身，支持链式调用
      */
     Future<V> removeListener(GenericFutureListener<? extends Future<? super V>> listener);
 
     /**
-     * Removes the first occurrence for each of the listeners from this future.
-     * The specified listeners are no longer notified when this
-     * future is {@linkplain #isDone() done}.  If the specified
-     * listeners are not associated with this future, this method
-     * does nothing and returns silently.
+     * 从该 Future 中移除每个指定监听器的第一个匹配项。被移除的监听器将不再在该 Future
+     * {@linkplain #isDone() 完成}时收到通知。如果指定的监听器未关联到该 Future，该方法不执行任何操作。
+     *
+     * @param listeners 要移除的监听器数组
+     * @return 该 Future 自身，支持链式调用
      */
     Future<V> removeListeners(GenericFutureListener<? extends Future<? super V>>... listeners);
 
     /**
-     * Waits for this future until it is done, and rethrows the cause of the failure if this future
-     * failed.
+     * 等待该 Future 直到完成，如果操作失败则重新抛出失败原因。
+     * <p>
+     * 该方法会响应中断，如果等待过程中线程被中断将抛出 {@link InterruptedException}。
+     *
+     * @return 该 Future 自身，支持链式调用
+     * @throws InterruptedException 如果当前线程在等待时被中断
      */
     Future<V> sync() throws InterruptedException;
 
     /**
-     * Waits for this future until it is done, and rethrows the cause of the failure if this future
-     * failed.
+     * 等待该 Future 直到完成（不可中断），如果操作失败则重新抛出失败原因。
+     * <p>
+     * 该方法不会响应中断，即使线程被中断也会继续等待。
+     *
+     * @return 该 Future 自身，支持链式调用
      */
     Future<V> syncUninterruptibly();
 
     /**
-     * Waits for this future to be completed.
+     * 等待该 Future 直到完成。
+     * <p>
+     * 该方法会响应中断，如果等待过程中线程被中断将抛出 {@link InterruptedException}。
      *
-     * @throws InterruptedException
-     *         if the current thread was interrupted
+     * @return 该 Future 自身，支持链式调用
+     * @throws InterruptedException 如果当前线程在等待时被中断
      */
     Future<V> await() throws InterruptedException;
 
     /**
-     * Waits for this future to be completed without
-     * interruption.  This method catches an {@link InterruptedException} and
-     * discards it silently.
+     * 等待该 Future 直到完成（不可中断）。
+     * <p>
+     * 该方法捕获 {@link InterruptedException} 并静默丢弃，不会响应中断。
+     *
+     * @return 该 Future 自身，支持链式调用
      */
     Future<V> awaitUninterruptibly();
 
     /**
-     * Waits for this future to be completed within the
-     * specified time limit.
+     * 在指定时间范围内等待该 Future 完成。
      *
-     * @return {@code true} if and only if the future was completed within
-     *         the specified time limit
-     *
-     * @throws InterruptedException
-     *         if the current thread was interrupted
+     * @param timeout 超时时间
+     * @param unit    超时时间单位
+     * @return 当且仅当该 Future 在指定时间范围内完成时返回 {@code true}
+     * @throws InterruptedException 如果当前线程在等待时被中断
      */
     boolean await(long timeout, TimeUnit unit) throws InterruptedException;
 
     /**
-     * Waits for this future to be completed within the
-     * specified time limit.
+     * 在指定毫秒数内等待该 Future 完成。
      *
-     * @return {@code true} if and only if the future was completed within
-     *         the specified time limit
-     *
-     * @throws InterruptedException
-     *         if the current thread was interrupted
+     * @param timeoutMillis 超时时间（毫秒）
+     * @return 当且仅当该 Future 在指定时间范围内完成时返回 {@code true}
+     * @throws InterruptedException 如果当前线程在等待时被中断
      */
     boolean await(long timeoutMillis) throws InterruptedException;
 
     /**
-     * Waits for this future to be completed within the
-     * specified time limit without interruption.  This method catches an
-     * {@link InterruptedException} and discards it silently.
+     * 在指定时间范围内等待该 Future 完成（不可中断）。
+     * <p>
+     * 该方法捕获 {@link InterruptedException} 并静默丢弃，不会响应中断。
      *
-     * @return {@code true} if and only if the future was completed within
-     *         the specified time limit
+     * @param timeout 超时时间
+     * @param unit    超时时间单位
+     * @return 当且仅当该 Future 在指定时间范围内完成时返回 {@code true}
      */
     boolean awaitUninterruptibly(long timeout, TimeUnit unit);
 
     /**
-     * Waits for this future to be completed within the
-     * specified time limit without interruption.  This method catches an
-     * {@link InterruptedException} and discards it silently.
+     * 在指定毫秒数内等待该 Future 完成（不可中断）。
+     * <p>
+     * 该方法捕获 {@link InterruptedException} 并静默丢弃，不会响应中断。
      *
-     * @return {@code true} if and only if the future was completed within
-     *         the specified time limit
+     * @param timeoutMillis 超时时间（毫秒）
+     * @return 当且仅当该 Future 在指定时间范围内完成时返回 {@code true}
      */
     boolean awaitUninterruptibly(long timeoutMillis);
 
     /**
-     * Return the result without blocking. If the future is not done yet this will return {@code null}.
+     * 非阻塞地获取异步操作的结果。如果该 Future 尚未完成，将返回 {@code null}。
      * <p>
-     * As it is possible that a {@code null} value is used to mark the future as successful you also need to check
-     * if the future is really done with {@link #isDone()} and not rely on the returned {@code null} value.
+     * 由于 {@code null} 本身可能是操作成功的结果值，因此不能仅依赖返回值来判断操作是否完成，
+     * 还需要结合 {@link #isDone()} 进行确认。
+     *
+     * @return 异步操作的结果，如果未完成则返回 {@code null}
      */
     V getNow();
 
     /**
      * {@inheritDoc}
+     * <p>
+     * 如果取消成功，将以 {@link CancellationException} 作为失败原因来标记该 Future 为失败状态。
      *
-     * If the cancellation was successful it will fail the future with a {@link CancellationException}.
+     * @param mayInterruptIfRunning 是否中断正在执行操作的线程
+     * @return 如果该 Future 被成功取消返回 {@code true}
      */
     @Override
     boolean cancel(boolean mayInterruptIfRunning);
