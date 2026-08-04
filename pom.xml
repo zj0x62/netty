@@ -950,7 +950,7 @@
       <dependency>
         <groupId>com.ning</groupId>
         <artifactId>compress-lzf</artifactId>
-        <version>1.2.0</version>
+        <version>1.2.1</version>
       </dependency>
       <dependency>
         <groupId>at.yawk.lz4</groupId>
@@ -2012,7 +2012,7 @@
         <!-- keep surefire and failsafe in sync -->
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.5.3</version>
+          <version>3.5.6</version>
         </plugin>
         <!-- keep surefire and failsafe in sync -->
         <plugin>
