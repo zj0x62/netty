@@ -1,5 +1,7 @@
 # EventLoop 体系
 
+> **前置知识**：多线程基础（Thread/锁/原子类）；NIO Selector 概念（学习计划任务 1.3）。
+
 ## 概述
 
 ### EventLoop 解决什么问题

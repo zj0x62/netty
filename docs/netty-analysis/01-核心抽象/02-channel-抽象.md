@@ -1,5 +1,7 @@
 # Channel 抽象
 
+> **前置知识**：Java NIO Channel/Selector 概念（学习计划任务 1.2/1.3）；Socket 编程基础。
+
 ## 概述
 
 Channel 是 Netty 对网络连接的抽象，是整个框架的核心概念之一。它代表了一个到网络套接字或能够进行 I/O 操作（如读、写、连接、绑定）的组件的连接点（nexus）。

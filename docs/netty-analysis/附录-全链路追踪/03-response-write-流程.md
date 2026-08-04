@@ -1,5 +1,7 @@
 # 数据写出全链路：从业务代码到网卡
 
+> **前置知识**：先读 04-03 数据读写与 02-流水线三篇。
+
 ## 概述
 
 本文追踪一次完整的数据写出流程：从业务代码调用 `ctx.writeAndFlush(response)` 开始，经历 Pipeline 出站传播、编码器编码、ChannelOutboundBuffer 缓冲、NIO Gathering Write，到最终数据通过 `SocketChannel.write()` 写入内核缓冲区。整个过程跨越 **transport**、**buffer**、**codec**、**common** 四大模块，展示了 Netty 的写缓冲区管理、背压控制和批量写出优化机制。

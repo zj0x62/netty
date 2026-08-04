@@ -1,5 +1,7 @@
 # ChannelHandler 体系
 
+> **前置知识**：责任链模式概念；Java 基础。
+
 ## 概述
 
 ChannelHandler 是 Netty 中处理 I/O 事件和拦截 I/O 操作的核心抽象。它解决了以下问题：

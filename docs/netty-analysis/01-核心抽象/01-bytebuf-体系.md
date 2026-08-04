@@ -1,5 +1,7 @@
 # ByteBuf 体系
 
+> **前置知识**：Java NIO ByteBuffer 基础（学习计划任务 1.1）；了解堆内/直接内存概念。
+
 ## 概述
 
 ### ByteBuf 解决什么问题

@@ -1,5 +1,7 @@
 # Pipeline 架构：Handler 链与 Context 链
 
+> **前置知识**：先读 01-核心抽象 四篇。
+
 ## 概述
 
 ChannelPipeline 是 Netty I/O 事件处理的核心骨架。它是一条由 ChannelHandler 组成的双向链表，所有入站（Inbound）和出站（Outbound）事件都沿着这条链表传播。每个 ChannelHandler 被包装为一个 ChannelHandlerContext 节点，Context 节点之间通过 `prev`/`next` 指针串联。

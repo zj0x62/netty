@@ -1,5 +1,7 @@
 # TCP 连接全链路：从 ServerBootstrap.bind() 到 Channel 激活
 
+> **前置知识**：先读 00-04 源码阅读地图 + 01-核心抽象 + 04-01/04-02。
+
 ## 概述
 
 本文追踪一次完整的 TCP 服务端连接建立流程：从用户调用 `ServerBootstrap.bind(port)` 开始，经历 Channel 创建、Pipeline 初始化、EventLoop 注册、端口绑定，到最终客户端连接到达后新 SocketChannel 的 accept 与注册激活。整个过程跨越 **bootstrap**、**transport**、**common** 三大模块，涉及 NIO Selector 的 ACCEPT 事件处理和双 EventLoopGroup 架构。

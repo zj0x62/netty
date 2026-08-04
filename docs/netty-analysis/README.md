@@ -2,13 +2,15 @@
 
 > 系统学习 Netty 的设计思想与实现原理，覆盖全部 40+ 模块
 
+> **初学者入口**：如果你刚开始学 Netty，请先阅读 [学习计划](学习计划.md)，按"先写 → 再读 → 最后再写"的三段式执行；学习状态记录在 [学习进度](学习进度.md)，流程规则见 [学习系统操作手册](学习系统操作手册.md)，任何 agent 均可据此随时接续。
+
 ## 项目信息
 
 | 项目 | 说明 |
 |------|------|
 | Netty 版本 | 4.2.17.Final-SNAPSHOT |
 | 分析日期 | 2026-07-17 |
-| 文档总数 | 60 篇 |
+| 文档总数 | 66 篇（正文 64 + 导航 2） |
 | 覆盖模块 | 40+ |
 | 分支 | 4.2 |
 | JDK 要求 | Java 8+（io_uring 需 Java 9+） |
@@ -57,7 +59,7 @@
 
 | 序号 | 文档 | 内容 |
 |------|------|------|
-| 16 | [NIO 传输](04-传输层/01-nio-传输.md) | NioEventLoop、NioServerSocketChannel |
+| 16 | [Bootstrap 启动引导](04-传输层/01-bootstrap-启动引导.md) | ServerBootstrap/Bootstrap 配置组装、Channel 创建/注册/绑定流程 |
 | 17 | [Accept/Connect](04-传输层/02-accept-connect-连接建立.md) | 服务端 Accept、客户端 Connect 流程 |
 | 18 | [Read/Write](04-传输层/03-read-write-数据读写.md) | 数据读写流程、WriteBufferWaterMark |
 | 19 | [Epoll 传输](04-传输层/04-epoll-传输.md) | Linux epoll 原生传输、边缘触发 |

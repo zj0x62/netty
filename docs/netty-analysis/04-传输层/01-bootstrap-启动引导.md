@@ -1,5 +1,7 @@
 # 04-传输层 01 - Netty Bootstrap 启动引导机制深度分析
 
+> **前置知识**：建议先读 00-04 源码阅读地图与 01-核心抽象（Channel/EventLoop）；Bootstrap 是框架入口，无 NIO 实战要求。
+
 > **分析范围**：`io.netty.bootstrap` 包核心类，涵盖服务端与客户端的 Channel 创建、初始化、注册、绑定全流程。
 >
 > **源码版本**：Netty 4.2（分支 `4.2`）

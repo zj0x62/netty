@@ -1,5 +1,7 @@
 # Buffer 分配器（ByteBufAllocator）深度分析
 
+> **前置知识**：先读 01-01 ByteBuf 体系。
+
 ## 概述
 
 Buffer 分配器是 Netty 内存管理体系的核心入口，负责为上层应用提供 `ByteBuf` 实例的创建能力。它解决了两个关键问题：

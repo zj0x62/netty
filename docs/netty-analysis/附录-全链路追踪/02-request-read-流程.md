@@ -1,5 +1,7 @@
 # 数据读取全链路：从网卡到业务 Handler
 
+> **前置知识**：先读 04-03 数据读写与 02-流水线三篇。
+
 ## 概述
 
 本文追踪一次完整的数据读取流程：从 `NioEventLoop` 事件循环检测到 `OP_READ` 事件开始，经历 ByteBuf 分配、NIO 读取、Pipeline 入站传播、解码器解码，到最终业务 Handler 处理解码后的消息。整个过程跨越 **transport**、**buffer**、**codec**、**common** 四大模块，展示了 Netty 零拷贝思想和自适应缓冲区管理机制。
